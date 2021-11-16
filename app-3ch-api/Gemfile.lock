@@ -71,6 +71,7 @@ GEM
       activesupport (>= 5.0)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
+    ipaddr (1.2.3)
     loofah (2.12.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -84,6 +85,8 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.12.5-x64-mingw32)
       racc (~> 1.4)
+    openssl (2.2.1)
+      ipaddr
     puma (5.5.2)
       nio4r (~> 2.0)
     racc (1.6.0)
@@ -141,6 +144,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
+  openssl
   puma (~> 5.0)
   rails (~> 6.1.4, >= 6.1.4.1)
   sqlite3 (~> 1.4)

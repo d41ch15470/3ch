@@ -15,7 +15,12 @@ worker_timeout 3600 if ENV.fetch("RAILS_ENV", "development") == "development"
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 #
-port ENV.fetch("PORT") { 3001 }
+port ENV.fetch("PORT") { 2999 }
+
+# ssl
+cert_file = "../certificate/oreore.crt"
+key_file = "../certificate/oreore.key"
+ssl_bind "0.0.0.0", "3001", cert: cert_file, key: key_file
 
 # Specifies the `environment` that Puma will run in.
 #
