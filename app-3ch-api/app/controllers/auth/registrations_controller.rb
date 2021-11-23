@@ -1,6 +1,6 @@
 class Auth::RegistrationsController < DeviseTokenAuth::RegistrationsController
   def index
-    render json: { user_id: SecureRandom.uuid }
+    render json: { user_id: SecureRandom.urlsafe_base64(6) }
   end
 
   private
@@ -16,6 +16,6 @@ class Auth::RegistrationsController < DeviseTokenAuth::RegistrationsController
   end
 
   def sign_up_params
-    params.require(:registration).permit(:password, :user_id)
+    params.require(:registration).permit(:password, :user_id, :user_type)
   end
 end

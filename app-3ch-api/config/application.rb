@@ -43,6 +43,7 @@ module App3chApi
         origins "https://localhost:3000"
         resource "*",
           headers: :any,
+          expose: ["access-token", "uid", "client", "token-type"],
           methods: [:get, :post, :options, :head]
       end
     end

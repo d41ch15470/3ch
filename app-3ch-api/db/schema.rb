@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 2021_11_23_044903) do
     t.string "uid", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "user_id"
+    t.string "user_type"
     t.text "tokens"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
