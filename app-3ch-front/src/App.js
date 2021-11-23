@@ -1,24 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import BBS from "pages/BBS";
+import NotFound from "pages/NotFound";
+import Top from "pages/Top";
+import UserProvider from "providers/UserProvider";
+import Admin from "pages/Admin";
+import AdminLogin from "pages/AdminLogin";
+
+const AppRouter = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route exact path="/" element={<BBS />} />
+        <Route exact path="/top" element={<Top />} />
+        <Route exact path="/admin" element={<Admin />} />
+        <Route exact path="/admin/login" element={<AdminLogin />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
+  );
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserProvider>
+      <AppRouter />
+    </UserProvider>
   );
 }
 
