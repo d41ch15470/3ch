@@ -5,6 +5,7 @@ import Top from "pages/Top";
 import UserProvider from "providers/UserProvider";
 import Admin from "pages/Admin";
 import AdminLogin from "pages/AdminLogin";
+import { SnackbarProvider } from "notistack";
 
 const AppRouter = () => {
   return (
@@ -22,9 +23,11 @@ const AppRouter = () => {
 
 function App() {
   return (
-    <UserProvider>
-      <AppRouter />
-    </UserProvider>
+    <SnackbarProvider maxSnack={2}>
+      <UserProvider>
+        <AppRouter />
+      </UserProvider>
+    </SnackbarProvider>
   );
 }
 
