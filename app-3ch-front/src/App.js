@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import BBS from "pages/BBS";
 import NotFound from "pages/NotFound";
@@ -6,6 +7,8 @@ import UserProvider from "providers/UserProvider";
 import Admin from "pages/Admin";
 import AdminLogin from "pages/AdminLogin";
 import { SnackbarProvider } from "notistack";
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/CloseRounded";
 
 const AppRouter = () => {
   return (
@@ -22,8 +25,19 @@ const AppRouter = () => {
 };
 
 function App() {
+  const notistackRef = useRef(null);
+
   return (
-    <SnackbarProvider maxSnack={1} sx={{ marginTop: "50px" }}>
+    <SnackbarProvider
+      ref={notistackRef}
+      action={(key) => (
+        <IconButton onClick={() => notistackRef.current.closeSnackbar(key)}>
+          <CloseIcon />
+        </IconButton>
+      )}
+      maxSnack={1}
+      sx={{ marginTop: "50px" }}
+    >
       <UserProvider>
         <AppRouter />
       </UserProvider>
