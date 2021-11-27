@@ -10,7 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_23_044903) do
+ActiveRecord::Schema.define(version: 2021_11_27_054229) do
+
+  create_table "categories", force: :cascade do |t|
+    t.string "category_name"
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.integer "category_id"
+    t.string "anonymous_id"
+    t.string "name"
+    t.string "mail"
+    t.string "title"
+    t.text "body"
+    t.boolean "hidden"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["category_id"], name: "index_posts_on_category_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "provider", default: "user_id", null: false
@@ -25,4 +45,5 @@ ActiveRecord::Schema.define(version: 2021_11_23_044903) do
     t.index ["user_id"], name: "index_users_on_user_id", unique: true
   end
 
+  add_foreign_key "posts", "categories"
 end

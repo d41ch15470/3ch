@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  category_id: 
+  category_name: MyString
+  delete: false
+  created_at: 2021-11-27 14:40:40
+  update_at: 2021-11-27 14:40:40
+
+two:
+  category_id: 
+  category_name: MyString
+  delete: false
+  created_at: 2021-11-27 14:40:40
+  update_at: 2021-11-27 14:40:40
