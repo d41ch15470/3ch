@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UserContext from "contexts/UserContext";
 
 const initialUserState = {
@@ -16,9 +16,9 @@ const UserProvider = ({ children }) => {
     : initialUserState;
   const [user, setUser] = useState(userState);
 
-  const resetUser = () => {
+  const resetUser = useCallback(() => {
     setUser(Object.assign({}, initialUserState));
-  };
+  }, []);
 
   const value = {
     user,

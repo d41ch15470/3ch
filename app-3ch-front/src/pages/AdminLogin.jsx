@@ -41,7 +41,7 @@ const AdminLogin = () => {
   // 初期表示の時点でアカウント情報をクリアする
   useEffect(() => {
     resetUser();
-  }, []);
+  }, [resetUser]);
 
   // バリデーション
   const validation = (target) => {

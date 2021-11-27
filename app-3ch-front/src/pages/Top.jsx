@@ -42,7 +42,7 @@ const Top = () => {
   // 初期表示の時点でアカウント情報をクリアする
   useEffect(() => {
     resetUser();
-  }, []);
+  }, [resetUser]);
 
   // バリデーション
   const validation = (target) => {
@@ -201,7 +201,7 @@ const Top = () => {
                 setPassword(e.target.value);
                 validation("password");
               }}
-              inputProps={{ minlength: isCreate ? 6 : 0 }}
+              inputProps={{ minLength: isCreate ? 6 : 0 }}
               inputRef={inputRefs.password}
               error={errorMessages.password !== ""}
               helperText={errorMessages.password}
