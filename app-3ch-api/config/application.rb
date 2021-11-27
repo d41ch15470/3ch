@@ -44,7 +44,7 @@ module App3chApi
         resource "*",
           headers: :any,
           expose: ["access-token", "uid", "client", "token-type"],
-          methods: [:get, :post, :options, :head]
+          methods: [:get, :post, :patch, :delete, :options, :head]
       end
     end
   end
