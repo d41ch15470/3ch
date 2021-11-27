@@ -1,9 +1,12 @@
-class CategoriesController < ApplicationController
+class CategoriesController < ApplicationController    
     def index
-        render json: { action: action_name }
+        render json: { status: "success",
+            categories: Category.all
+        }
     end
 
     def create
+        Category.create({:category_name => "category1", :status => false})
         render json: { action: action_name }
     end
 
