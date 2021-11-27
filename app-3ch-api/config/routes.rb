@@ -5,9 +5,19 @@ Rails.application.routes.draw do
     sessions: 'auth/sessions'
   }
   devise_scope :user do
-    get 'auth', to: 'auth/registrations#index'
+    get '/auth', to: 'auth/registrations#index'
   end
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  resources :categories
-  resources :posts
+
+  # categories
+  get '/categories', to: 'categories#index'
+  post '/categories', to: 'categories#create'
+  patch '/categories/:category_id', to: 'categories#update'
+  delete '/categories/:category_id', to: 'categories#destroy'
+
+  # posts
+  get '/posts', to: 'posts#index'
+  get '/categories/:category_id/posts', to: 'posts#index'
+  post '/categories/:category_id/posts', to: 'posts#create'
+  patch '/posts/:post_id', to: 'posts#update'
+  delete '/posts/:post_id', to: 'posts#destroy'
 end
