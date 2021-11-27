@@ -23,7 +23,7 @@ const AppRouter = () => {
 
 function App() {
   return (
-    <SnackbarProvider maxSnack={2}>
+    <SnackbarProvider maxSnack={1} sx={{ marginTop: "50px" }}>
       <UserProvider>
         <AppRouter />
       </UserProvider>
