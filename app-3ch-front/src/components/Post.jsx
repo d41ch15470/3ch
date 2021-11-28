@@ -23,6 +23,7 @@ const Post = ({
   name,
   mail,
   enableHidden,
+  onlyVisibleHidden,
   onClickHidden,
   children,
 }) => {
@@ -49,18 +50,26 @@ const Post = ({
         <CardHeader
           title={title}
           subheader={name}
-          {...(enableHidden && {
-            action: (
-              <Tooltip title="非表示にする">
-                <IconButton
-                  aria-label="hidden"
-                  onClick={() => setDialogOpen(true)}
-                >
-                  <VisibilityOffOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            ),
-          })}
+          {...(enableHidden && onlyVisibleHidden
+            ? {
+                action: (
+                  <Tooltip title="非表示の投稿">
+                    <VisibilityOffOutlinedIcon />
+                  </Tooltip>
+                ),
+              }
+            : enableHidden && {
+                action: (
+                  <Tooltip title="非表示にする">
+                    <IconButton
+                      aria-label="hidden"
+                      onClick={() => setDialogOpen(true)}
+                    >
+                      <VisibilityOffOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                ),
+              })}
           sx={{ paddingBottom: "0px" }}
         />
         <CardContent sx={{ paddingTop: "0px", paddingBottom: "0px" }}>

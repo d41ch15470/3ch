@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -94,9 +94,16 @@ function BBS() {
     setErrorMessages(Object.assign({}, initialErrorMessages));
   };
 
+  // 画面項目のロード
+  const load = useCallback(async () => {
+    setLoading(true);
+    await getPosts();
+    await getCategories();
+    setLoading(false);
+  }, []);
+
   // 投稿の取得
   const getPosts = async () => {
-    setLoading(true);
     await axios
       .get("https://localhost:3001/posts")
       .then((response) => {
@@ -107,7 +114,6 @@ function BBS() {
       .catch((e) => {
         console.log("Error");
       });
-    setLoading(false);
   };
 
   // カテゴリーの取得
@@ -157,7 +163,7 @@ function BBS() {
       .post(`https://localhost:3001/categories/${categoryId}/posts`, postBody)
       .then((response) => {
         if (response.data.status === "success") {
-          getPosts();
+          load();
           initializeInput();
           enqueueSnackbar("投稿しました", {
             variant: "success",
@@ -180,7 +186,7 @@ function BBS() {
       .patch(`https://localhost:3001/posts/${postId}`, body)
       .then((response) => {
         if (response.data.status === "success") {
-          getPosts();
+          load();
           enqueueSnackbar("非表示にしました", {
             variant: "success",
             anchorOrigin: snackbarOptions,
@@ -197,9 +203,8 @@ function BBS() {
 
   // 画面更新処理
   useEffect(() => {
-    getPosts();
-    getCategories();
-  }, []);
+    load();
+  }, [load]);
 
   // ログアウトしてログイン画面へ遷移
   const logout = () => {
