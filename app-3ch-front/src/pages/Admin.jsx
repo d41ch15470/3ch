@@ -36,12 +36,14 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Post from "components/Post";
 import SubmitButton from "components/Button";
-import { Category } from "@mui/icons-material";
+import { useSnackbar } from "notistack";
 
 const Admin = () => {
   const theme = createTheme();
   const navigator = useNavigate();
   const { user, resetUser } = useContext(UserContext);
+  const { enqueueSnackbar } = useSnackbar();
+  const snackbarOptions = { vertical: "top", horizontal: "right" };
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -56,7 +58,7 @@ const Admin = () => {
     await axios
       .get("https://localhost:3001/categories?allCnt=true")
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           setCategories(response.data.categories);
         }
       })
@@ -75,7 +77,7 @@ const Admin = () => {
     await axios
       .get(postUrl)
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           setPosts(response.data.posts);
         }
       })
@@ -92,8 +94,12 @@ const Admin = () => {
     await axios
       .post("https://localhost:3001/categories", body)
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           load();
+          enqueueSnackbar("カテゴリーを作成しました", {
+            variant: "success",
+            anchorOrigin: snackbarOptions,
+          });
         }
       })
       .catch((e) => console.log("Error"));
@@ -107,8 +113,12 @@ const Admin = () => {
     await axios
       .patch(`https://localhost:3001/categories/${targetCategoryId}`, body)
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           load();
+          enqueueSnackbar("カテゴリー名を変更しました", {
+            variant: "success",
+            anchorOrigin: snackbarOptions,
+          });
         }
       })
       .catch((e) => console.log("Error"));
@@ -119,8 +129,12 @@ const Admin = () => {
     await axios
       .delete(`https://localhost:3001/categories/${targetCategoryId}`)
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           setSelectedCategory(-1);
+          enqueueSnackbar("カテゴリーを削除しました", {
+            variant: "success",
+            anchorOrigin: snackbarOptions,
+          });
         }
       })
       .catch((e) => console.log("Error"));
@@ -261,7 +275,7 @@ const Admin = () => {
             }}
           >
             <CardContent>
-              <Typography variant="h5">カテゴリ</Typography>
+              <Typography variant="h5">カテゴリー</Typography>
               <List>
                 {categories.map((category) => (
                   <ListItem

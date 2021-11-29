@@ -148,13 +148,22 @@ const Top = () => {
           setIsCreate(false);
         } else {
           enqueueSnackbar("サインアップに失敗しました", {
-            variant: "success",
+            variant: "error",
             anchorOrigin: snackbarOptions,
           });
           setIsCreate(false);
         }
       })
-      .catch((e) => console.log("Error"));
+      .catch((e) => {
+        enqueueSnackbar(
+          "サインアップに失敗しました。もう一度試してください。",
+          {
+            variant: "error",
+            anchorOrigin: snackbarOptions,
+          },
+        );
+        setIsCreate(false);
+      });
   };
 
   return (

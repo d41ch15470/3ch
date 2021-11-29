@@ -19,5 +19,4 @@ Rails.application.routes.draw do
   get '/categories/:category_id/posts', to: 'posts#index'
   post '/categories/:category_id/posts', to: 'posts#create'
   patch '/posts/:post_id', to: 'posts#update'
-  delete '/posts/:post_id', to: 'posts#destroy'
 end

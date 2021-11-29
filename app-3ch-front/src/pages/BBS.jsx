@@ -107,7 +107,7 @@ function BBS() {
     await axios
       .get("https://localhost:3001/posts")
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           setPosts(response.data.posts);
         }
       })
@@ -121,7 +121,7 @@ function BBS() {
     await axios
       .get("https://localhost:3001/categories")
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           setCategories(response.data.categories);
           if (response.data.categories.length > 0) {
             setCategoryId(response.data.categories[0]["id"]);
@@ -152,17 +152,25 @@ function BBS() {
       });
       return;
     }
+    const postHeader = {
+      "access-token": user.accessToken,
+      "token-type": user.tokenType,
+      client: user.client,
+      expiry: user.expiry,
+      uid: user.uid,
+    };
     const postBody = {
-      anonymousId: user.uid ?? "",
       name,
       mail,
       title,
       body,
     };
     await axios
-      .post(`https://localhost:3001/categories/${categoryId}/posts`, postBody)
+      .post(`https://localhost:3001/categories/${categoryId}/posts`, postBody, {
+        headers: postHeader,
+      })
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           load();
           initializeInput();
           enqueueSnackbar("投稿しました", {
@@ -185,7 +193,7 @@ function BBS() {
     await axios
       .patch(`https://localhost:3001/posts/${postId}`, body)
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           load();
           enqueueSnackbar("非表示にしました", {
             variant: "success",
