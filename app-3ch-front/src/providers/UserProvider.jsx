@@ -2,17 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import UserContext from "contexts/UserContext";
 
 const initialUserState = {
-  accessToken: null,
-  client: null,
-  expiry: null,
   uid: null,
-  tokenType: null,
   userType: "anonymous",
 };
 
 const UserProvider = ({ children }) => {
-  const userState = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
+  const userState = sessionStorage.getItem("user")
+    ? JSON.parse(sessionStorage.getItem("user"))
     : initialUserState;
   const [user, setUser] = useState(userState);
 
@@ -28,9 +24,9 @@ const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (user.uid) {
-      localStorage.setItem("user", JSON.stringify(user));
+      sessionStorage.setItem("user", JSON.stringify(user));
     } else {
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
     }
   }, [user]);
 

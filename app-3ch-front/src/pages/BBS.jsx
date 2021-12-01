@@ -20,7 +20,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import axios from "axios";
+import { axios, api } from "common/axios";
 import UserContext from "contexts/UserContext";
 import Post from "components/Post";
 import SubmitButton from "components/Button";
@@ -104,8 +104,7 @@ function BBS() {
 
   // 投稿の取得
   const getPosts = async () => {
-    await axios
-      .get("https://localhost:3001/posts")
+    await axios({ api: api.getPosts })
       .then((response) => {
         if (response.data.success) {
           setPosts(response.data.posts);
@@ -118,8 +117,7 @@ function BBS() {
 
   // カテゴリーの取得
   const getCategories = async () => {
-    await axios
-      .get("https://localhost:3001/categories")
+    await axios({ api: api.getCategories })
       .then((response) => {
         if (response.data.success) {
           setCategories(response.data.categories);
@@ -152,23 +150,13 @@ function BBS() {
       });
       return;
     }
-    const postHeader = {
-      "access-token": user.accessToken,
-      "token-type": user.tokenType,
-      client: user.client,
-      expiry: user.expiry,
-      uid: user.uid,
-    };
     const postBody = {
       name,
       mail,
       title,
       body,
     };
-    await axios
-      .post(`https://localhost:3001/categories/${categoryId}/posts`, postBody, {
-        headers: postHeader,
-      })
+    await axios({ api: api.createPost, resourceId: categoryId, data: postBody })
       .then((response) => {
         if (response.data.success) {
           load();
@@ -190,8 +178,7 @@ function BBS() {
   // 投稿を非表示にする
   const changeHidden = async (postId) => {
     const body = { hidden: true };
-    await axios
-      .patch(`https://localhost:3001/posts/${postId}`, body)
+    await axios({ api: api.hidePost, resourceId: postId, data: body })
       .then((response) => {
         if (response.data.success) {
           load();
@@ -215,7 +202,22 @@ function BBS() {
   }, [load]);
 
   // ログアウトしてログイン画面へ遷移
-  const logout = () => {
+  const logout = async () => {
+    await axios({ api: api.signOut })
+      .then((response) => {
+        if (response.data.status === "success") {
+          enqueueSnackbar("ログアウトしました", {
+            variant: "success",
+            anchorOrigin: snackbarOptions,
+          });
+        }
+      })
+      .catch((e) => {
+        enqueueSnackbar("ログアウトに失敗しました", {
+          variant: "error",
+          anchorOrigin: snackbarOptions,
+        });
+      });
     resetUser();
     navigator("/top");
   };

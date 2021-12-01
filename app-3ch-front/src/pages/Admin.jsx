@@ -30,7 +30,7 @@ import AddIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
-import axios from "axios";
+import { axios, api } from "common/axios";
 import UserContext from "contexts/UserContext";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -41,7 +41,7 @@ import { useSnackbar } from "notistack";
 const Admin = () => {
   const theme = createTheme();
   const navigator = useNavigate();
-  const { user, resetUser } = useContext(UserContext);
+  const { resetUser } = useContext(UserContext);
   const { enqueueSnackbar } = useSnackbar();
   const snackbarOptions = { vertical: "top", horizontal: "right" };
   const [loading, setLoading] = useState(false);
@@ -55,8 +55,7 @@ const Admin = () => {
 
   // カテゴリ情報の取得
   const getCategories = async () => {
-    await axios
-      .get("https://localhost:3001/categories?allCnt=true")
+    await axios({ api: api.getCategories })
       .then((response) => {
         if (response.data.success) {
           setCategories(response.data.categories);
@@ -69,13 +68,9 @@ const Admin = () => {
 
   // 投稿の取得
   const getPosts = useCallback(async () => {
-    const postUrl =
-      selectedCategory === -1
-        ? "https://localhost:3001/posts"
-        : `https://localhost:3001/categories/${selectedCategory}/posts`;
+    const resourceId = selectedCategory === -1 ? undefined : selectedCategory;
 
-    await axios
-      .get(postUrl)
+    await axios({ api: api.getPosts, resourceId: resourceId })
       .then((response) => {
         if (response.data.success) {
           setPosts(response.data.posts);
@@ -91,8 +86,7 @@ const Admin = () => {
     const body = {
       categoryName: value,
     };
-    await axios
-      .post("https://localhost:3001/categories", body)
+    await axios({ api: api.createCategory, data: body })
       .then((response) => {
         if (response.data.success) {
           load();
@@ -110,8 +104,11 @@ const Admin = () => {
     const body = {
       categoryName: value,
     };
-    await axios
-      .patch(`https://localhost:3001/categories/${targetCategoryId}`, body)
+    await axios({
+      api: api.updateCategory,
+      resourceId: targetCategoryId,
+      data: body,
+    })
       .then((response) => {
         if (response.data.success) {
           load();
@@ -126,8 +123,7 @@ const Admin = () => {
 
   // カテゴリーの削除
   const deleteCategory = async () => {
-    await axios
-      .delete(`https://localhost:3001/categories/${targetCategoryId}`)
+    await axios({ api: api.deleteCategory, resourceId: targetCategoryId })
       .then((response) => {
         if (response.data.success) {
           setSelectedCategory(-1);
@@ -154,7 +150,22 @@ const Admin = () => {
   }, [load]);
 
   // ログアウトしてログイン画面へ遷移
-  const logout = () => {
+  const logout = async () => {
+    await axios({ api: api.signOut })
+      .then((response) => {
+        if (response.data.status === "success") {
+          enqueueSnackbar("ログアウトしました", {
+            variant: "success",
+            anchorOrigin: snackbarOptions,
+          });
+        }
+      })
+      .catch((e) => {
+        enqueueSnackbar("ログアウトに失敗しました", {
+          variant: "error",
+          anchorOrigin: snackbarOptions,
+        });
+      });
     resetUser();
     navigator("/admin/login");
   };

@@ -11,7 +11,7 @@ import {
 import { useContext, useEffect, useState, useRef } from "react";
 import UserContext from "contexts/UserContext";
 import Button from "components/Button";
-import axios from "axios";
+import { axios, api } from "common/axios";
 import { useNavigate } from "react-router";
 import { useSnackbar } from "notistack";
 
@@ -74,14 +74,9 @@ const AdminLogin = () => {
       password,
       user_type: "admin",
     };
-    await axios
-      .post("https://localhost:3001/auth/sign_in", body)
+    await axios({ api: api.signIn, data: body })
       .then((response) => {
         user.uid = response.data.data["uid"];
-        user.accessToken = response.headers["access-token"];
-        user.client = response.headers["client"];
-        user.tokenType = response.headers["token-type"];
-        user.expiry = response.headers["expiry"];
         user.userType = response.data.data["user_type"];
         setUser(Object.assign({}, user));
         navigator("/admin");
@@ -118,7 +113,7 @@ const AdminLogin = () => {
             <TextField
               fullWidth
               label="パスワード"
-              type="text"
+              type="password"
               value={password}
               sx={{ margin: "10px 0px 0px 0px" }}
               onChange={(e) => {

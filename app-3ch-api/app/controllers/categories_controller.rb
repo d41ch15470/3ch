@@ -31,7 +31,7 @@ class CategoriesController < ApplicationController
   def create
     params.require(:category).permit(:category_name)
 
-    Category.create({ category_name: params[:category_name], status: '' })
+    Category.create({ category_name: params[:category_name], status: false })
 
     send_success(:ok)
   end
@@ -49,7 +49,7 @@ class CategoriesController < ApplicationController
     params.permit(:category_id)
 
     @category = Category.find(params[:category_id])
-    @category.update({ status: 'delete' })
+    @category.update({ status: true })
 
     send_success(:ok)
   end

@@ -12,7 +12,7 @@ import {
 import { useContext, useEffect, useState, useRef } from "react";
 import UserContext from "contexts/UserContext";
 import Button from "components/Button";
-import axios from "axios";
+import { axios, api } from "common/axios";
 import { useSnackbar } from "notistack";
 
 const Top = () => {
@@ -77,14 +77,9 @@ const Top = () => {
       userType: "user",
     };
 
-    await axios
-      .post("https://localhost:3001/auth/sign_in", body)
+    await axios({ api: api.signIn, data: body })
       .then((response) => {
         user.uid = response.data.data["uid"];
-        user.accessToken = response.headers["access-token"];
-        user.client = response.headers["client"];
-        user.tokenType = response.headers["token-type"];
-        user.expiry = response.headers["expiry"];
         user.userType = response.data.data["user_type"];
         setUser(Object.assign({}, user));
         navigator("/");
@@ -99,8 +94,7 @@ const Top = () => {
 
   // 匿名ID取得
   const getAnonymousId = async () => {
-    await axios
-      .get("https://localhost:3001/auth/")
+    await axios({ api: api.getAnonymousId })
       .then((response) => {
         // 入力欄の初期化
         setPassword("");
@@ -137,8 +131,7 @@ const Top = () => {
       password,
       user_type: "user",
     };
-    await axios
-      .post("https://localhost:3001/auth/", body)
+    await axios({ api: api.signUp, data: body })
       .then((response) => {
         if (response.data.status === "success") {
           enqueueSnackbar("サインアップしました", {
