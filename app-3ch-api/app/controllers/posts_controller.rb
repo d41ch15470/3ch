@@ -46,7 +46,7 @@ class PostsController < ApplicationController
     params.require(:post).permit(:post_id, :hidden)
 
     @post = Post.find(params[:post_id])
-    if @post.user_id == current_user.user_id
+    if @post[:anonymous_id] == current_user.user_id
       @post.update({ hidden: params[:hidden] })
       send_success(:ok)
     else
