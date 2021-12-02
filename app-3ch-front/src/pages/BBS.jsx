@@ -94,13 +94,26 @@ function BBS() {
     setErrorMessages(Object.assign({}, initialErrorMessages));
   };
 
+  // ログインチェック
+  const loginCheck = useCallback(async () => {
+    // userTypeがadminの場合は認証情報をクリアする
+    if (user.userType === "admin") {
+      resetUser();
+      // サインアウトのリクエストだけ投げ捨てる
+      await axios({ api: api.signOut })
+        .then(() => {})
+        .catch(() => {});
+    }
+  }, [user, resetUser]);
+
   // 画面項目のロード
   const load = useCallback(async () => {
     setLoading(true);
+    await loginCheck();
     await getPosts();
     await getCategories();
     setLoading(false);
-  }, []);
+  }, [loginCheck]);
 
   // 投稿の取得
   const getPosts = async () => {
@@ -258,7 +271,6 @@ function BBS() {
             >
               {user.userType === "anonymous" && "未ログイン"}
               {user.userType === "user" && "匿名ログイン中"}
-              {user.userType === "admin" && "管理者ログイン中"}
             </Typography>
             {user.userType === "anonymous" ? (
               <Button color="success" variant="contained" onClick={login}>

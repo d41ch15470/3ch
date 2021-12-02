@@ -1,4 +1,16 @@
 class Auth::SessionsController < DeviseTokenAuth::SessionsController
+  def index
+    params.require(:session).permit(:type)
+
+    if params[:type] == 'admin' && admin?
+      send_success(:ok)
+    elsif params[:type] == 'user' && user?
+      send_success(:ok)
+    else
+      send_error(:unauthorized, 'authentication error')
+    end
+  end
+
   private
 
   def find_resource(field, value)

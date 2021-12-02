@@ -1,28 +1,35 @@
 class CategoriesController < ApplicationController
+  before_action :authenticate_admin?, only: %i[create update destroy]
+
   def index
-    params.permit(:allCnt)
+    categories = if admin?
+                   Category.left_outer_joins(:posts)
+                           .where.not(status: true)
+                           .group(:id, :category_name)
+                           .select('categories.id, category_name, count(posts.id) as count, sum(ifnull(posts.hidden, 0)) hidden_count')
+                 else
+                   Category.where.not(status: true)
+                           .select('categories.id, category_name')
+                 end
 
-    categories = Category.left_outer_joins(:posts)
-                         .where.not(status: 'delete')
-                         .group(:id, :category_name)
-                         .select('categories.id, category_name, count(posts.id) as count, sum(ifnull(posts.hidden, 0)) hidden_count')
-
-    # 集計
-    cnt = 0
-    hidden_cnt = 0
-    categories_list = []
-    categories.each do |category|
-      cnt += category[:count]
-      hidden_cnt += category[:hidden_count]
-      categories_list.push(category)
-    end
-
-    if params[:allCnt] == 'true'
-      categories_list.unshift({ id: -1, category_name: 'すべて', count: cnt, hidden_count: hidden_cnt })
+    category_list = nil
+    if admin?
+      category_list = []
+      # 集計
+      cnt = 0
+      hidden_cnt = 0
+      categories.each do |category|
+        cnt += category[:count]
+        hidden_cnt += category[:hidden_count]
+        category_list.push(category)
+      end
+      category_list.unshift({ id: -1, category_name: 'すべて', count: cnt, hidden_count: hidden_cnt })
+    else
+      category_list = categories
     end
 
     response = {
-      categories: categories_list
+      categories: category_list
     }
 
     send_success(:ok, response)

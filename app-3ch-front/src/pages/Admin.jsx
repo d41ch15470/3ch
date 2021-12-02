@@ -44,6 +44,7 @@ const Admin = () => {
   const { resetUser } = useContext(UserContext);
   const { enqueueSnackbar } = useSnackbar();
   const snackbarOptions = { vertical: "top", horizontal: "right" };
+  const [initialLogin, setInitialLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -52,6 +53,11 @@ const Admin = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [targetCategoryId, setTargetCategoryId] = useState(-1);
   const [openAddDialog, setOpenAddDialog] = useState(false);
+
+  // ログインチェック（ロードのたびに呼び出される）
+  const loginCheck = async () => {
+    return await axios({ api: api.loginCheck, data: { type: "admin" } });
+  };
 
   // カテゴリ情報の取得
   const getCategories = async () => {
@@ -139,10 +145,26 @@ const Admin = () => {
   // ロード
   const load = useCallback(async () => {
     setLoading(true);
-    await getCategories();
-    await getPosts();
-    setLoading(false);
-  }, [getPosts]);
+    let unauthorize = false;
+    await loginCheck()
+      .then((response) => {
+        if (response.data.success) {
+          if (initialLogin) setInitialLogin(false);
+        } else {
+          unauthorize = true;
+        }
+      })
+      .catch((e) => (unauthorize = true));
+
+    if (unauthorize) {
+      resetUser();
+      navigator("/admin/login");
+    } else {
+      await getCategories();
+      await getPosts();
+      setLoading(false);
+    }
+  }, [getPosts, initialLogin, resetUser, navigator]);
 
   // 初期表示
   useEffect(() => {
@@ -224,173 +246,187 @@ const Admin = () => {
 
   return (
     <>
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <Box sx={{ display: "flex" }}>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-            >
-              3ch 管理者機能
-            </Typography>
-            <Button color="success" variant="contained" onClick={logout}>
-              ログアウト
-            </Button>
-          </Toolbar>
-        </AppBar>
-      </Box>
-      <CategoryDialog
-        open={openAddDialog}
-        enableTextField={true}
-        onClose={() => setOpenAddDialog(false)}
-        onSubmit={(value) => createCategory(value)}
-        title="カテゴリーの追加"
-        discription="追加したいカテゴリー名を入力してください"
-      />
-      <CategoryDialog
-        open={openEditDialog}
-        enableTextField={true}
-        onClose={() => setOpenEditDialog(false)}
-        onSubmit={(value) => updateCategory(value)}
-        title="カテゴリーの編集"
-        discription="変更後のカテゴリー名を入力してください"
-      />
-      <CategoryDialog
-        open={openDeleteDialog}
-        onClose={() => setOpenDeleteDialog(false)}
-        onSubmit={() => deleteCategory()}
-        title="カテゴリーの削除"
-        discription="カテゴリーを削除します。この操作は取り消せません。"
-      />
-      <Container
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <Box>
-          <Card
-            variant="outlined"
+      {initialLogin ? (
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={loading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      ) : (
+        <>
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+          <Box sx={{ display: "flex" }}>
+            <AppBar position="static">
+              <Toolbar>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
+                >
+                  3ch 管理者機能
+                </Typography>
+                <Button color="success" variant="contained" onClick={logout}>
+                  ログアウト
+                </Button>
+              </Toolbar>
+            </AppBar>
+          </Box>
+          <CategoryDialog
+            open={openAddDialog}
+            enableTextField={true}
+            onClose={() => setOpenAddDialog(false)}
+            onSubmit={(value) => createCategory(value)}
+            title="カテゴリーの追加"
+            discription="追加したいカテゴリー名を入力してください"
+          />
+          <CategoryDialog
+            open={openEditDialog}
+            enableTextField={true}
+            onClose={() => setOpenEditDialog(false)}
+            onSubmit={(value) => updateCategory(value)}
+            title="カテゴリーの編集"
+            discription="変更後のカテゴリー名を入力してください"
+          />
+          <CategoryDialog
+            open={openDeleteDialog}
+            onClose={() => setOpenDeleteDialog(false)}
+            onSubmit={() => deleteCategory()}
+            title="カテゴリーの削除"
+            discription="カテゴリーを削除します。この操作は取り消せません。"
+          />
+          <Container
             sx={{
-              margin: theme.spacing(1),
-              width: "400px",
-              maxHeight: "600px",
+              display: "flex",
+              justifyContent: "center",
             }}
           >
-            <CardContent>
-              <Typography variant="h5">カテゴリー</Typography>
-              <List>
-                {categories.map((category) => (
-                  <ListItem
-                    key={category["id"]}
-                    {...(category["id"] !== -1 && {
-                      secondaryAction: (
-                        <>
-                          <Tooltip title="編集する">
-                            <IconButton
-                              edge="end"
-                              aria-label="edit"
-                              onClick={() => {
-                                setTargetCategoryId(category["id"]);
-                                setOpenEditDialog(true);
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="削除する">
-                            <IconButton
-                              edge="end"
-                              aria-label="delete"
-                              onClick={() => {
-                                setTargetCategoryId(category["id"]);
-                                setOpenDeleteDialog(true);
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </>
-                      ),
-                    })}
-                    disablePadding
-                  >
-                    <ListItemButton
-                      selected={selectedCategory === category["id"]}
-                      onClick={() => setSelectedCategory(category["id"])}
+            <Box>
+              <Card
+                variant="outlined"
+                sx={{
+                  margin: theme.spacing(1),
+                  width: "400px",
+                  maxHeight: "600px",
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h5">カテゴリー</Typography>
+                  <List>
+                    {categories.map((category) => (
+                      <ListItem
+                        key={category["id"]}
+                        {...(category["id"] !== -1 && {
+                          secondaryAction: (
+                            <>
+                              <Tooltip title="編集する">
+                                <IconButton
+                                  edge="end"
+                                  aria-label="edit"
+                                  onClick={() => {
+                                    setTargetCategoryId(category["id"]);
+                                    setOpenEditDialog(true);
+                                  }}
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="削除する">
+                                <IconButton
+                                  edge="end"
+                                  aria-label="delete"
+                                  onClick={() => {
+                                    setTargetCategoryId(category["id"]);
+                                    setOpenDeleteDialog(true);
+                                  }}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </>
+                          ),
+                        })}
+                        disablePadding
+                      >
+                        <ListItemButton
+                          selected={selectedCategory === category["id"]}
+                          onClick={() => setSelectedCategory(category["id"])}
+                        >
+                          <ListItemText
+                            primary={
+                              <>
+                                {category["category_name"]}&nbsp;
+                                <Tooltip title="全件数">
+                                  <Chip
+                                    label={category["count"]}
+                                    size="small"
+                                  />
+                                </Tooltip>
+                                &nbsp;
+                                <Tooltip title="非表示件数">
+                                  <Chip
+                                    icon={<VisibilityOffOutlinedIcon />}
+                                    label={category["hidden_count"]}
+                                    size="small"
+                                  />
+                                </Tooltip>
+                              </>
+                            }
+                          ></ListItemText>
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                </CardContent>
+                <CardActions
+                  sx={{
+                    display: "flex",
+                    justifyContent: "right",
+                  }}
+                >
+                  <Tooltip title="カテゴリーを追加する">
+                    <IconButton
+                      aria-label="add category"
+                      onClick={() => setOpenAddDialog(true)}
                     >
-                      <ListItemText
-                        primary={
-                          <>
-                            {category["category_name"]}&nbsp;
-                            <Tooltip title="全件数">
-                              <Chip label={category["count"]} size="small" />
-                            </Tooltip>
-                            &nbsp;
-                            <Tooltip title="非表示件数">
-                              <Chip
-                                icon={<VisibilityOffOutlinedIcon />}
-                                label={category["hidden_count"]}
-                                size="small"
-                              />
-                            </Tooltip>
-                          </>
-                        }
-                      ></ListItemText>
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </CardContent>
-            <CardActions
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                </CardActions>
+              </Card>
+            </Box>
+            <Stack
               sx={{
                 display: "flex",
-                justifyContent: "right",
+                width: "400px",
+                height: "900px",
+                overflowY: "auto",
               }}
             >
-              <Tooltip title="カテゴリーを追加する">
-                <IconButton
-                  aria-label="add category"
-                  onClick={() => setOpenAddDialog(true)}
+              {posts.map((post, index) => (
+                <Post
+                  key={index}
+                  postId={post["id"]}
+                  category={post["category_name"]}
+                  title={post.title}
+                  name={post.name}
+                  mail={post.mail}
+                  enableHidden={post.hidden}
+                  onlyVisibleHidden={true}
                 >
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-            </CardActions>
-          </Card>
-        </Box>
-        <Stack
-          sx={{
-            display: "flex",
-            width: "400px",
-            height: "900px",
-            overflowY: "auto",
-          }}
-        >
-          {posts.map((post, index) => (
-            <Post
-              key={index}
-              postId={post["id"]}
-              category={post["category_name"]}
-              title={post.title}
-              name={post.name}
-              mail={post.mail}
-              enableHidden={post.hidden}
-              onlyVisibleHidden={true}
-            >
-              {post.body}
-            </Post>
-          ))}
-        </Stack>
-      </Container>
+                  {post.body}
+                </Post>
+              ))}
+            </Stack>
+          </Container>
+        </>
+      )}
     </>
   );
 };

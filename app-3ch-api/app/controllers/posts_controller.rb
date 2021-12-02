@@ -1,8 +1,10 @@
 class PostsController < ApplicationController
+  before_action :authenticate_user?, only: [:update]
+
   def index
     params.permit(:category_id)
 
-    posts = if !params[:category_id].nil?
+    posts = if admin? && !params[:category_id].nil?
               Post.left_outer_joins(:category)
                   .where(category_id: params[:category_id])
                   .where.not(categories: { status: 'delete' })
@@ -28,7 +30,7 @@ class PostsController < ApplicationController
 
     post = {
       category_id: params[:category_id],
-      anonymous_id: current_user.nil? ? '' : current_user.uid,
+      anonymous_id: user? ? current_user.uid : '',
       name: params[:name],
       mail: params[:mail],
       title: params[:title],
@@ -44,8 +46,11 @@ class PostsController < ApplicationController
     params.require(:post).permit(:post_id, :hidden)
 
     @post = Post.find(params[:post_id])
-    @post.update({ hidden: params[:hidden] })
-
-    send_success(:ok)
+    if @post.user_id == current_user.user_id
+      @post.update({ hidden: params[:hidden] })
+      send_success(:ok)
+    else
+      send_error(:unauthorized, 'authentication error')
+    end
   end
 end
