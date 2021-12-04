@@ -1,24 +1,26 @@
-# README
+# API サーバ
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+- Ruby version
 
-Things you may want to cover:
+  3.0.2
 
-* Ruby version
+- installation
 
-* System dependencies
+```
+bundle install
+rails db:create
+rials db:migrate
+```
 
-* Configuration
+- rails db:create に失敗する場合
 
-* Database creation
+```
+gem uninstall sqlite3 --all
+gem install sqlite3 --platform ruby
+```
 
-* Database initialization
+- How to run
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+rails s
+```
