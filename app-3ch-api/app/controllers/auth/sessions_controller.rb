@@ -24,18 +24,6 @@ class Auth::SessionsController < DeviseTokenAuth::SessionsController
                 end
   end
 
-  def create_and_assign_token
-    if @resource.respond_to?(:with_lock)
-      @resource.with_lock do
-        @token = @resource.create_token
-        @resource.save!
-      end
-    else
-      @token = @resource.create_token
-      @resource.save!
-    end
-  end
-
   def provider
     'user_id'
   end
