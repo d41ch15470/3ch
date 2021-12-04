@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Card,
@@ -9,7 +9,7 @@ import {
   createTheme,
   TextField,
 } from "@mui/material";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useState, useRef } from "react";
 import UserContext from "contexts/UserContext";
 import Button from "components/Button";
 import { axios, api } from "common/axios";
@@ -39,11 +39,6 @@ const Top = () => {
     password: useRef(null),
   };
 
-  // 初期表示の時点でアカウント情報をクリアする
-  useEffect(() => {
-    resetUser();
-  }, [resetUser]);
-
   // バリデーション
   const validation = (target) => {
     const ref = inputRefs[target].current;
@@ -60,6 +55,15 @@ const Top = () => {
 
     setErrors(Object.assign({}, errors));
     setErrorMessages(Object.assign({}, errorMessages));
+  };
+
+  // ログインせずに利用する
+  const useUnAuth = async () => {
+    // ログイン情報のクリア
+    resetUser();
+    // サインアウトのリクエストだけ投げ捨てる
+    await axios({ api: api.signOut }).catch(() => {});
+    navigator("/");
   };
 
   // ログイン
@@ -168,7 +172,7 @@ const Top = () => {
             ログインせずに利用する場合は、投稿の非表示機能が利用できません。
           </CardContent>
           <CardActions>
-            <Button fullWidth LinkComponent={Link} to="/">
+            <Button fullWidth onClick={useUnAuth}>
               匿名ログインせずに利用する
             </Button>
           </CardActions>
@@ -203,7 +207,10 @@ const Top = () => {
                 setPassword(e.target.value);
                 validation("password");
               }}
-              inputProps={{ minLength: isCreate ? 6 : 0 }}
+              inputProps={{
+                minLength: isCreate ? 6 : 0,
+                pattern: isCreate ? "[^ 　]+" : ".*",
+              }}
               inputRef={inputRefs.password}
               error={errorMessages.password !== ""}
               helperText={errorMessages.password}

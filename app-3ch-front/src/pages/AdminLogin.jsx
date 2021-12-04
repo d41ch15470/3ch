@@ -8,7 +8,7 @@ import {
   createTheme,
   TextField,
 } from "@mui/material";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useState, useRef } from "react";
 import UserContext from "contexts/UserContext";
 import Button from "components/Button";
 import { axios, api } from "common/axios";
@@ -18,7 +18,7 @@ import { useSnackbar } from "notistack";
 const AdminLogin = () => {
   const theme = createTheme();
   const navigator = useNavigate();
-  const { user, setUser, resetUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const { enqueueSnackbar } = useSnackbar();
   const snackbarOptions = { vertical: "top", horizontal: "right" };
   const [userId, setUserId] = useState("");
@@ -37,11 +37,6 @@ const AdminLogin = () => {
     userId: useRef(null),
     password: useRef(null),
   };
-
-  // 初期表示の時点でアカウント情報をクリアする
-  useEffect(() => {
-    resetUser();
-  }, [resetUser]);
 
   // バリデーション
   const validation = (target) => {

@@ -87,7 +87,7 @@ const Admin = () => {
       });
   }, [selectedCategory]);
 
-  // カテゴリーの作成
+  // カテゴリの作成
   const createCategory = async (value) => {
     const body = {
       categoryName: value,
@@ -96,7 +96,7 @@ const Admin = () => {
       .then((response) => {
         if (response.data.success) {
           load();
-          enqueueSnackbar("カテゴリーを作成しました", {
+          enqueueSnackbar("カテゴリを作成しました", {
             variant: "success",
             anchorOrigin: snackbarOptions,
           });
@@ -105,7 +105,7 @@ const Admin = () => {
       .catch((e) => console.log("Error"));
   };
 
-  // カテゴリーの編集
+  // カテゴリの編集
   const updateCategory = async (value) => {
     const body = {
       categoryName: value,
@@ -118,7 +118,7 @@ const Admin = () => {
       .then((response) => {
         if (response.data.success) {
           load();
-          enqueueSnackbar("カテゴリー名を変更しました", {
+          enqueueSnackbar("カテゴリ名を変更しました", {
             variant: "success",
             anchorOrigin: snackbarOptions,
           });
@@ -127,13 +127,13 @@ const Admin = () => {
       .catch((e) => console.log("Error"));
   };
 
-  // カテゴリーの削除
+  // カテゴリの削除
   const deleteCategory = async () => {
     await axios({ api: api.deleteCategory, resourceId: targetCategoryId })
       .then((response) => {
         if (response.data.success) {
           setSelectedCategory(-1);
-          enqueueSnackbar("カテゴリーを削除しました", {
+          enqueueSnackbar("カテゴリを削除しました", {
             variant: "success",
             anchorOrigin: snackbarOptions,
           });
@@ -206,9 +206,22 @@ const Admin = () => {
     const onClick = async () => {
       // 入力チェック
       setHelperText("");
-      if (enableTextField && !input) {
-        setHelperText("入力してください");
+      if (enableTextField && (!input || input.trim() === "")) {
+        setHelperText("入力必須です（空欄のみの入力もできません）");
         return;
+      } else if (input.trim() !== "" && input.length > 50) {
+        setHelperText("カテゴリ名は50文字以内で入力してください");
+        return;
+      }
+      // 重複チェック
+      if (input.trim() !== "") {
+        const count = categories.filter(
+          (category) => category["category_name"] === input,
+        );
+        if (count.length > 0) {
+          setHelperText("すでに登録済みのカテゴリです");
+          return;
+        }
       }
       await onSubmit(input);
       onClose();
@@ -222,7 +235,7 @@ const Admin = () => {
           {enableTextField && (
             <TextField
               autoFocus
-              label="カテゴリー"
+              label="カテゴリ"
               fullWidth
               value={input}
               error={helperText !== ""}
@@ -283,23 +296,23 @@ const Admin = () => {
             enableTextField={true}
             onClose={() => setOpenAddDialog(false)}
             onSubmit={(value) => createCategory(value)}
-            title="カテゴリーの追加"
-            discription="追加したいカテゴリー名を入力してください"
+            title="カテゴリの追加"
+            discription="追加したいカテゴリ名を入力してください"
           />
           <CategoryDialog
             open={openEditDialog}
             enableTextField={true}
             onClose={() => setOpenEditDialog(false)}
             onSubmit={(value) => updateCategory(value)}
-            title="カテゴリーの編集"
-            discription="変更後のカテゴリー名を入力してください"
+            title="カテゴリの編集"
+            discription="変更後のカテゴリ名を入力してください"
           />
           <CategoryDialog
             open={openDeleteDialog}
             onClose={() => setOpenDeleteDialog(false)}
             onSubmit={() => deleteCategory()}
-            title="カテゴリーの削除"
-            discription="カテゴリーを削除します。この操作は取り消せません。"
+            title="カテゴリの削除"
+            discription="カテゴリを削除します。この操作は取り消せません。"
           />
           <Container
             sx={{
@@ -317,7 +330,7 @@ const Admin = () => {
                 }}
               >
                 <CardContent>
-                  <Typography variant="h5">カテゴリー</Typography>
+                  <Typography variant="h5">カテゴリ</Typography>
                   <List>
                     {categories.map((category) => (
                       <ListItem
@@ -390,7 +403,7 @@ const Admin = () => {
                     justifyContent: "right",
                   }}
                 >
-                  <Tooltip title="カテゴリーを追加する">
+                  <Tooltip title="カテゴリを追加する">
                     <IconButton
                       aria-label="add category"
                       onClick={() => setOpenAddDialog(true)}

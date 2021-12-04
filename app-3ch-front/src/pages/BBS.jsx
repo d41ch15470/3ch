@@ -71,9 +71,22 @@ function BBS() {
     const ref = inputRefs[target].current;
     let errorMessage = "";
 
-    if (ref && !ref.validity.valid) {
-      errorMessage = ref.validationMessage;
+    switch (target) {
+      case "body":
+        console.log(ref.value);
+        if (!ref.value || ref.value.trim() === "") {
+          errorMessage = "本文は入力必須です（空欄のみの投稿もできません）";
+        } else if (ref.value && ref.value.length > 500) {
+          errorMessage = "本文は500文字以内で入力してください";
+        }
+        break;
+      default:
+        if (ref && !ref.validity.valid) {
+          errorMessage = ref.validationMessage;
+        }
+        break;
     }
+
     errors[target] = errorMessage !== "";
     errorMessages[target] = errorMessage;
 
@@ -96,15 +109,21 @@ function BBS() {
 
   // ログインチェック
   const loginCheck = useCallback(async () => {
-    // userTypeがadminの場合は認証情報をクリアする
-    if (user.userType === "admin") {
+    // adminの場合は認証情報をクリアする
+    const response = await axios({
+      api: api.loginCheck,
+      data: { type: "admin" },
+    }).catch((e) => {});
+
+    if (response && response.success) {
+      // ログインチェックに通る場合はサインアウトする
       resetUser();
       // サインアウトのリクエストだけ投げ捨てる
       await axios({ api: api.signOut })
         .then(() => {})
         .catch(() => {});
     }
-  }, [user, resetUser]);
+  }, [resetUser]);
 
   // 画面項目のロード
   const load = useCallback(async () => {
@@ -128,7 +147,7 @@ function BBS() {
       });
   };
 
-  // カテゴリーの取得
+  // カテゴリの取得
   const getCategories = async () => {
     await axios({ api: api.getCategories })
       .then((response) => {
@@ -148,7 +167,7 @@ function BBS() {
   const sendPost = async () => {
     if (categories.length === 0) {
       enqueueSnackbar(
-        "カテゴリーの登録がありません。管理者へ連絡してください。",
+        "カテゴリの登録がありません。管理者へ連絡してください。",
         {
           variant: "error",
           anchorOrigin: snackbarOptions,
@@ -270,7 +289,7 @@ function BBS() {
               }}
             >
               {user.userType === "anonymous" && "未ログイン"}
-              {user.userType === "user" && "匿名ログイン中"}
+              {user.userType === "user" && `匿名ログイン中（${user.uid}）`}
             </Typography>
             {user.userType === "anonymous" ? (
               <Button color="success" variant="contained" onClick={login}>
@@ -300,11 +319,11 @@ function BBS() {
                 後から自分の投稿を非表示にする場合は匿名ログインしてください。
               </Typography>
               <FormControl fullWidth sx={{ marginTop: 1 }}>
-                <InputLabel id="category-label">カテゴリー</InputLabel>
+                <InputLabel id="category-label">カテゴリ</InputLabel>
                 <Select
                   labelId="catogory-label"
                   value={categoryId}
-                  label="カテゴリー"
+                  label="カテゴリ"
                   onChange={(e) => setCategoryId(e.target.value)}
                 >
                   {categories.map((category) => (
@@ -319,6 +338,7 @@ function BBS() {
                 label="名前"
                 type="text"
                 value={name}
+                inputProps={{ maxLength: 50 }}
                 inputRef={inputRefs.name}
                 error={errorMessages.name !== ""}
                 helperText={errorMessages.name}
@@ -334,6 +354,7 @@ function BBS() {
                 label="メールアドレス"
                 type="text"
                 value={mail}
+                inputProps={{ maxLength: 256 }}
                 inputRef={inputRefs.mail}
                 error={errorMessages.mail !== ""}
                 helperText={errorMessages.mail}
@@ -349,6 +370,7 @@ function BBS() {
                 label="件名"
                 type="text"
                 value={title}
+                inputProps={{ maxLength: 256 }}
                 inputRef={inputRefs.title}
                 error={errorMessages.title !== ""}
                 helperText={errorMessages.title}

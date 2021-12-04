@@ -5,4 +5,6 @@ class User < ActiveRecord::Base
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable, :validatable
   include DeviseTokenAuth::Concerns::User
+
+  validates :encrypted_password, presence: true
 end

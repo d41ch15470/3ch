@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 2021_11_27_054229) do
     t.boolean "status"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["category_name"], name: "index_categories_on_category_name", unique: true
   end
 
   create_table "posts", force: :cascade do |t|
