@@ -9,6 +9,7 @@ import AdminLogin from "pages/AdminLogin";
 import { SnackbarProvider } from "notistack";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/CloseRounded";
+import ErrorBoundary from "components/ErrorBoundary";
 
 const AppRouter = () => {
   return (
@@ -28,20 +29,22 @@ function App() {
   const notistackRef = useRef(null);
 
   return (
-    <SnackbarProvider
-      ref={notistackRef}
-      action={(key) => (
-        <IconButton onClick={() => notistackRef.current.closeSnackbar(key)}>
-          <CloseIcon />
-        </IconButton>
-      )}
-      maxSnack={1}
-      sx={{ marginTop: "50px" }}
-    >
-      <UserProvider>
-        <AppRouter />
-      </UserProvider>
-    </SnackbarProvider>
+    <ErrorBoundary>
+      <SnackbarProvider
+        ref={notistackRef}
+        action={(key) => (
+          <IconButton onClick={() => notistackRef.current.closeSnackbar(key)}>
+            <CloseIcon />
+          </IconButton>
+        )}
+        maxSnack={1}
+        sx={{ marginTop: "50px" }}
+      >
+        <UserProvider>
+          <AppRouter />
+        </UserProvider>
+      </SnackbarProvider>
+    </ErrorBoundary>
   );
 }
 
