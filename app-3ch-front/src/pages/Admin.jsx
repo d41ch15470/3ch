@@ -57,7 +57,7 @@ const Admin = () => {
 
   // ログインチェック（ロードのたびに呼び出される）
   const loginCheck = async () => {
-    return await axios({ api: api.loginCheck, data: { type: "admin" } });
+    return await axios({ api: api.loginCheck });
   };
 
   // カテゴリ情報の取得
@@ -153,8 +153,7 @@ const Admin = () => {
     let unauthorize = false;
     await loginCheck()
       .then((response) => {
-        if (response.data.success) {
-          if (initialLogin) setInitialLogin(false);
+        if (response.data.success && response.data["user_type"] === "admin") {
         } else {
           unauthorize = true;
         }
@@ -165,9 +164,13 @@ const Admin = () => {
       resetUser();
       navigator("/admin/login");
     } else {
-      await getCategories();
-      await getPosts();
-      setLoading(false);
+      if (initialLogin) {
+        setInitialLogin(false);
+      } else {
+        await getCategories();
+        await getPosts();
+        setLoading(false);
+      }
     }
   }, [getPosts, initialLogin, resetUser, navigator]);
 

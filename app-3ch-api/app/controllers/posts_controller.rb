@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user?, only: [:update]
+  before_action :authenticate_user!, only: [:update]
 
   def index
     params.permit(:category_id)
@@ -28,9 +28,10 @@ class PostsController < ApplicationController
   def create
     params.require(:post).permit(:category_id, :name, :mail, :title, :body)
 
+    print user_signed_in?
     post = {
       category_id: params[:category_id],
-      anonymous_id: user? ? current_user.uid : '',
+      anonymous_id: user_signed_in? ? current_user.uid : '',
       name: params[:name],
       mail: params[:mail],
       title: params[:title],

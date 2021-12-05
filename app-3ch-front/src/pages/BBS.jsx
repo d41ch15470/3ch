@@ -107,32 +107,13 @@ function BBS() {
     setErrorMessages(Object.assign({}, initialErrorMessages));
   };
 
-  // ログインチェック
-  const loginCheck = useCallback(async () => {
-    // adminの場合は認証情報をクリアする
-    const response = await axios({
-      api: api.loginCheck,
-      data: { type: "admin" },
-    }).catch((e) => {});
-
-    if (response && response.data.success) {
-      // ログインチェックに通る場合はサインアウトする
-      resetUser();
-      // サインアウトのリクエストだけ投げ捨てる
-      await axios({ api: api.signOut })
-        .then(() => {})
-        .catch(() => {});
-    }
-  }, [resetUser]);
-
   // 画面項目のロード
   const load = useCallback(async () => {
     setLoading(true);
-    await loginCheck();
     await getPosts();
     await getCategories();
     setLoading(false);
-  }, [loginCheck]);
+  }, []);
 
   // 投稿の取得
   const getPosts = async () => {
@@ -152,9 +133,12 @@ function BBS() {
     await axios({ api: api.getCategories })
       .then((response) => {
         if (response.data.success) {
-          setCategories(response.data.categories);
-          if (response.data.categories.length > 0) {
-            setCategoryId(response.data.categories[0]["id"]);
+          const resCategories = response.data.categories.filter(
+            (category) => category["id"] !== -1,
+          );
+          setCategories(resCategories);
+          if (resCategories.length > 0) {
+            setCategoryId(resCategories[0]["id"]);
           }
         }
       })
@@ -290,6 +274,7 @@ function BBS() {
             >
               {user.userType === "anonymous" && "未ログイン"}
               {user.userType === "user" && `匿名ログイン中（${user.uid}）`}
+              {user.userType === "admin" && `管理者ログイン中（${user.uid}）`}
             </Typography>
             {user.userType === "anonymous" ? (
               <Button color="success" variant="contained" onClick={login}>

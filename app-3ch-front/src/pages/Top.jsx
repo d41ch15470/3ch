@@ -78,7 +78,6 @@ const Top = () => {
     const body = {
       userId,
       password,
-      userType: "user",
     };
 
     await axios({ api: api.signIn, data: body })
@@ -133,7 +132,6 @@ const Top = () => {
     const body = {
       userId,
       password,
-      user_type: "user",
     };
     await axios({ api: api.signUp, data: body })
       .then((response) => {

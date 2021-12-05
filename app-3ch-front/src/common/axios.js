@@ -6,7 +6,7 @@ export const api = {
   signUp: { url: "/auth", method: "POST" },
   signIn: { url: "/auth/sign_in", method: "POST" },
   signOut: { url: "/auth/sign_out", method: "DELETE" },
-  loginCheck: { url: "/auth/check", method: "POST" },
+  loginCheck: { url: "/auth/check", method: "GET" },
   getCategories: { url: "/categories", method: "GET" },
   createCategory: { url: "/categories", method: "POST" },
   updateCategory: {

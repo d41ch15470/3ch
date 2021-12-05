@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   }
   devise_scope :user do
     get '/auth', to: 'auth/registrations#index'
-    post '/auth/check', to: 'auth/sessions#index'
+    get '/auth/check', to: 'auth/sessions#index'
   end
 
   # categories

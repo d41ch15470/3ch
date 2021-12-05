@@ -67,21 +67,27 @@ const AdminLogin = () => {
     const body = {
       userId,
       password,
-      user_type: "admin",
     };
+    let loginSuccess = false;
     await axios({ api: api.signIn, data: body })
       .then((response) => {
         user.uid = response.data.data["uid"];
         user.userType = response.data.data["user_type"];
-        setUser(Object.assign({}, user));
-        navigator("/admin");
+        if (user.uid === "admin") {
+          loginSuccess = true;
+        }
       })
-      .catch((e) => {
-        enqueueSnackbar("ログインに失敗しました", {
-          variant: "error",
-          anchorOrigin: snackbarOptions,
-        });
+      .catch((e) => {});
+    if (loginSuccess) {
+      setUser(Object.assign({}, user));
+      navigator("/admin");
+    } else {
+      await axios({ api: api.signOut }).catch((e) => {});
+      enqueueSnackbar("ログインに失敗しました", {
+        variant: "error",
+        anchorOrigin: snackbarOptions,
       });
+    }
   };
 
   return (

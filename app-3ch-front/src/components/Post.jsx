@@ -74,7 +74,9 @@ const Post = ({
         />
         <CardContent sx={{ paddingTop: "0px", paddingBottom: "0px" }}>
           <Typography variant="subtitle2">{mail}</Typography>
-          <Typography variant="body1">{children}</Typography>
+          <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+            {children}
+          </Typography>
         </CardContent>
         <CardActions>
           <Chip label={category} size="small" />
