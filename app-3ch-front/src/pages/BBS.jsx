@@ -221,7 +221,7 @@ function BBS() {
   const logout = async () => {
     await axios({ api: api.signOut })
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.success) {
           enqueueSnackbar("ログアウトしました", {
             variant: "success",
             anchorOrigin: snackbarOptions,

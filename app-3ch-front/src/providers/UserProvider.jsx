@@ -9,7 +9,7 @@ const initialUserState = {
 const UserProvider = ({ children }) => {
   const userState = sessionStorage.getItem("user")
     ? JSON.parse(sessionStorage.getItem("user"))
-    : initialUserState;
+    : Object.assign({}, initialUserState);
   const [user, setUser] = useState(userState);
 
   const resetUser = useCallback(() => {
