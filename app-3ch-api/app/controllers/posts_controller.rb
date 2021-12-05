@@ -7,12 +7,12 @@ class PostsController < ApplicationController
     posts = if admin? && !params[:category_id].nil?
               Post.left_outer_joins(:category)
                   .where(category_id: params[:category_id])
-                  .where.not(categories: { status: 'delete' })
+                  .where.not(categories: { status: true })
                   .order(created_at: 'DESC')
                   .select(:id, :category_name, :anonymous_id, :name, :mail, :title, :body, :hidden)
             else
               Post.left_outer_joins(:category)
-                  .where.not(categories: { status: 'delete' })
+                  .where.not(categories: { status: true })
                   .order(created_at: 'DESC')
                   .select(:id, :category_name, :anonymous_id, :name, :mail, :title, :body, :hidden)
             end
