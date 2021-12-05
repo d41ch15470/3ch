@@ -115,7 +115,7 @@ function BBS() {
       data: { type: "admin" },
     }).catch((e) => {});
 
-    if (response && response.success) {
+    if (response && response.data.success) {
       // ログインチェックに通る場合はサインアウトする
       resetUser();
       // サインアウトのリクエストだけ投げ捨てる

@@ -6,6 +6,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  CardHeader,
   Chip,
   CircularProgress,
   Container,
@@ -132,7 +133,11 @@ const Admin = () => {
     await axios({ api: api.deleteCategory, resourceId: targetCategoryId })
       .then((response) => {
         if (response.data.success) {
-          setSelectedCategory(-1);
+          if (selectedCategory === -1) {
+            load();
+          } else {
+            setSelectedCategory(-1);
+          }
           enqueueSnackbar("カテゴリを削除しました", {
             variant: "success",
             anchorOrigin: snackbarOptions,
@@ -326,11 +331,11 @@ const Admin = () => {
                 sx={{
                   margin: theme.spacing(1),
                   width: "400px",
-                  maxHeight: "600px",
+                  maxHeight: "500px",
                 }}
               >
-                <CardContent>
-                  <Typography variant="h5">カテゴリ</Typography>
+                <CardHeader title="カテゴリ" />
+                <CardContent sx={{ maxHeight: "300px", overflowY: "auto" }}>
                   <List>
                     {categories.map((category) => (
                       <ListItem
